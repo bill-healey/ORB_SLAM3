@@ -11,6 +11,11 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}  -Wall   -O3")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall   -O3")
 set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -march=native")
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -march=native")
+set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -w")
+add_compile_options(-std=c++14)
+add_definitions(-D M_PI=3.14159265358979323846)
 
 # Check C++11 or C++0x support
 include(CheckCXXCompilerFlag)
@@ -31,9 +36,12 @@ endif()
 LIST(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake_modules)
 
 find_package(OpenCV 4.4)
+if(NOT OpenCV_FOUND)
+   find_package(OpenCV 3.2 REQUIRED)
    if(NOT OpenCV_FOUND)
-      message(FATAL_ERROR "OpenCV > 4.4 not found.")
+      message(FATAL_ERROR "OpenCV > 3.4 not found.")
    endif()
+endif()
 
 MESSAGE("OPENCV VERSION:")
 MESSAGE(${OpenCV_VERSION})
@@ -41,6 +49,7 @@ MESSAGE(${OpenCV_VERSION})
 find_package(Eigen3 3.1.0 REQUIRED)
 find_package(Pangolin REQUIRED)
 find_package(realsense2)
+find_package(Threads REQUIRED)
 
 include_directories(
 ${PROJECT_SOURCE_DIR}
@@ -111,18 +120,26 @@ include/GeometricTools.h
 include/TwoViewReconstruction.h
 include/SerializationUtils.h
 include/Config.h
-include/Settings.h)
+include/Settings.h
+        )
 
 add_subdirectory(Thirdparty/g2o)
+link_directories(${PROJECT_SOURCE_DIR}/Thirdparty/DBoW2/lib)
+link_directories(${PROJECT_SOURCE_DIR}/Thirdparty/g2o/lib)
+
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -lmsvcrt")
 
 target_link_libraries(${PROJECT_NAME}
 ${OpenCV_LIBS}
 ${EIGEN3_LIBS}
 ${Pangolin_LIBRARIES}
-${PROJECT_SOURCE_DIR}/Thirdparty/DBoW2/lib/libDBoW2.so
-${PROJECT_SOURCE_DIR}/Thirdparty/g2o/lib/libg2o.so
--lboost_serialization
+"${PROJECT_SOURCE_DIR}/Thirdparty/DBoW2/lib/libDBoW2.dll.a"
+g2o
+Threads::Threads
+boost_serialization-mt
 -lcrypto
+-ldbgHelp
+-lmsvcrt
 )
 
 # If RealSense SDK is found the library is added and its examples compiled
@@ -137,6 +154,8 @@ endif()
 
 
 # Build examples
+
+if(FALSE)
 
 # RGB-D examples
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/Examples/RGB-D)
@@ -388,3 +407,18 @@ if(realsense2_FOUND)
             Examples_old/Stereo-Inertial/stereo_inertial_realsense_D435i.cc)
     target_link_libraries(stereo_inertial_realsense_D435i_old ${PROJECT_NAME})
 endif()
+endif()
+
+#Monocular Example
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/Examples/Monocular)
+add_executable(mono_tum
+        Examples/Monocular/mono_tum.cc)
+target_link_libraries(mono_tum ${PROJECT_NAME})
+
+#Live Executable
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/Examples/Live)
+add_executable(live
+	Examples/Live/live.cc)
+target_link_libraries(live ${PROJECT_NAME}
+	zmq
+	)

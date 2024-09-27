@@ -50,7 +50,7 @@ class ConstraintPoseImu;
 class GeometricCamera;
 class ORBextractor;
 
-class Frame
+class __declspec(dllexport) Frame
 {
 public:
     Frame();

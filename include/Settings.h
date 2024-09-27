@@ -36,7 +36,7 @@ namespace ORB_SLAM3 {
 
     //TODO: change to double instead of float
 
-    class Settings {
+    class __declspec(dllexport) Settings {
     public:
         /*
          * Enum for the different camera types implemented

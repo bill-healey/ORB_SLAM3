@@ -80,7 +80,7 @@ class LocalMapping;
 class LoopClosing;
 class Settings;
 
-class System
+class __declspec(dllexport) System
 {
 public:
     // Input sensor

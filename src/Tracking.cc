@@ -1822,7 +1822,7 @@ void Tracking::Track()
             cerr << "ERROR: Frame with a timestamp older than previous frame detected!" << endl;
             unique_lock<mutex> lock(mMutexImuQueue);
             mlQueueImuData.clear();
-            CreateMapInAtlas();
+	    CreateMapInAtlas();
             return;
         }
         else if(mCurrentFrame.mTimeStamp>mLastFrame.mTimeStamp+1.0)
@@ -1961,7 +1961,7 @@ void Tracking::Track()
                     if ( mCurrentFrame.mnId<=(mnLastRelocFrameId+mnFramesToResetIMU) &&
                          (mSensor==System::IMU_MONOCULAR || mSensor==System::IMU_STEREO || mSensor == System::IMU_RGBD))
                     {
-                        mState = LOST;
+                        //mState = LOST;
                     }
                     else if(pCurrentMap->KeyFramesInMap()>10)
                     {
@@ -1971,7 +1971,7 @@ void Tracking::Track()
                     }
                     else
                     {
-                        mState = LOST;
+                        //mState = LOST;
                     }
                 }
             }
@@ -1992,9 +1992,9 @@ void Tracking::Track()
 
                         if (mCurrentFrame.mTimeStamp-mTimeStampLost>time_recently_lost)
                         {
-                            mState = LOST;
-                            Verbose::PrintMess("Track Lost...", Verbose::VERBOSITY_NORMAL);
-                            bOK=false;
+			    //mState = LOST;
+                            //Verbose::PrintMess("Track Lost...", Verbose::VERBOSITY_NORMAL);
+                            //bOK=false;
                         }
                     }
                     else
@@ -2005,9 +2005,9 @@ void Tracking::Track()
                         //std::cout << "mTimeStampLost:" << to_string(mTimeStampLost) << std::endl;
                         if(mCurrentFrame.mTimeStamp-mTimeStampLost>3.0f && !bOK)
                         {
-                            mState = LOST;
-                            Verbose::PrintMess("Track Lost...", Verbose::VERBOSITY_NORMAL);
-                            bOK=false;
+                            //mState = LOST;
+                            //Verbose::PrintMess("Track Lost...", Verbose::VERBOSITY_NORMAL);
+                            //bOK=false;
                         }
                     }
                 }

@@ -53,7 +53,7 @@ class LoopClosing;
 class System;
 class Settings;
 
-class Tracking
+class __declspec(dllexport) Tracking
 {  
 
 public:

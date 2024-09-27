@@ -28,27 +28,27 @@
 namespace ORB_SLAM3
 {
 
-class ViewerConfig
+class __declspec(dllexport) ViewerConfig
 {
 
 };
 
-class CameraConfig
+class __declspec(dllexport) CameraConfig
 {
 
 };
 
-class ORBExtractorConfig
+class __declspec(dllexport) ORBExtractorConfig
 {
 
 };
 
-class IMUConfig
+class __declspec(dllexport) IMUConfig
 {
 
 };
 
-class ConfigParser
+class __declspec(dllexport) ConfigParser
 {
 public:
     bool ParseConfigFile(std::string &strConfigFile);

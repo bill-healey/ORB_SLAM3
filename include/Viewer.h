@@ -37,7 +37,7 @@ class MapDrawer;
 class System;
 class Settings;
 
-class Viewer
+class __declspec(dllexport) Viewer
 {
 public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW

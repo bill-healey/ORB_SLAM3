@@ -84,6 +84,9 @@ Time*
 Table_Euroc
 Table_TUMVI_rooms/
 *.pyc
+ORBvoc.bin
+*~
+*.exe
 *.osa
 .idea/
 my_settings.txt

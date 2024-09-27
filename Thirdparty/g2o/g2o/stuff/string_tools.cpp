@@ -36,6 +36,7 @@
 #include <cstdio>
 #include <iostream>
 #include <iterator>
+#include <csignal>
 
 #if (defined (UNIX) || defined(CYGWIN)) && !defined(ANDROID)
 #include <wordexp.h>
@@ -44,6 +45,65 @@
 namespace g2o {
 
 using namespace std;
+
+int portable_vasprintf(char** strp, const char* fmt, va_list ap) {
+    // Attempt to write to a buffer of this size first.
+    std::raise(SIGINT);
+    int length = 512;
+    char* buffer = (char*)malloc(length);
+    if (!buffer) return -1;
+
+    // Copy va_list to avoid consuming it, so we can use it again
+    va_list ap_copy;
+    va_copy(ap_copy, ap);
+
+    // Try to print to the buffer
+    int nchars = vsnprintf(buffer, length, fmt, ap_copy);
+
+    if (nchars < 0) {
+        // vsnprintf error
+        free(buffer);
+        va_end(ap_copy);
+        return -1;
+    }
+
+    if (nchars < length) {
+        // Buffer was big enough
+        *strp = buffer;
+        va_end(ap_copy);
+        return nchars;
+    }
+
+    // Buffer was too small; allocate buffer with correct size and print again
+    length = nchars + 1; // +1 for '\0'
+    char* new_buffer = (char*)realloc(buffer, length);
+    if (!new_buffer) {
+        free(buffer);
+        va_end(ap_copy);
+        return -1;
+    }
+
+    nchars = vsnprintf(new_buffer, length, fmt, ap);
+    if (nchars < 0) {
+        // vsnprintf error
+        free(new_buffer);
+    } else {
+        *strp = new_buffer;
+    }
+
+    va_end(ap_copy);
+    return nchars;
+}
+
+// Replacement function for vasprintf
+int portable_asprintf(char** strp, const char* fmt, ...) {
+    std::raise(SIGINT);
+    va_list ap;
+    va_start(ap, fmt);
+    int result = portable_vasprintf(strp, fmt, ap);
+    va_end(ap);
+    return result;
+}
 
 std::string trim(const std::string& s)
 {
@@ -97,7 +157,7 @@ std::string formatString(const char* fmt, ...)
   char* auxPtr = NULL;
   va_list arg_list;
   va_start(arg_list, fmt);
-  int numChar = vasprintf(&auxPtr, fmt, arg_list);
+  int numChar = portable_vasprintf(&auxPtr, fmt, arg_list);
   va_end(arg_list);
   string retString;
   if (numChar != -1)
@@ -114,7 +174,7 @@ int strPrintf(std::string& str, const char* fmt, ...)
   char* auxPtr = NULL;
   va_list arg_list;
   va_start(arg_list, fmt);
-  int numChars = vasprintf(&auxPtr, fmt, arg_list);
+  int numChars = portable_vasprintf(&auxPtr, fmt, arg_list);
   va_end(arg_list);
   str = auxPtr;
   free(auxPtr);

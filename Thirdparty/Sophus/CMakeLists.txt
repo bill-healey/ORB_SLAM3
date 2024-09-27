@@ -64,6 +64,8 @@ set(SOPHUS_OTHER_FILES
   sophus/example_ensure_handler.cpp
 )
 
+add_compile_options(-Wno-array-bounds)
+
 if(MSVC)
   # Define common math constants if we compile with MSVC
   target_compile_definitions (sophus INTERFACE _USE_MATH_DEFINES)

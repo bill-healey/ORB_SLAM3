@@ -38,7 +38,7 @@ class KeyFrame;
 class Atlas;
 class KeyFrameDatabase;
 
-class Map
+class __declspec(dllexport) Map
 {
     friend class boost::serialization::access;
 
